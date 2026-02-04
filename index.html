@@ -135,8 +135,8 @@
     let vx = 0;
     let vy = 0;
 
-    const acceleration = 0.06;
-    let maxSpeed = 4.5;
+    const acceleration = 0.08;
+    let maxSpeed = 5;
     const bounceDamping = 0.85;
 
     function moveNo() {
@@ -153,8 +153,8 @@
       y += vy;
     
       // Get proper bounding box
-      const maxX = window.innerWidth - no.offsetWidth;
-      const maxY = window.innerHeight - no.offsetHeight;
+      const maxX = window.innerWidth;
+      const maxY = window.innerHeight;
     
       // Bounce on edges
       if (x <= 0) { x = 0; vx = -vx * bounceDamping; }
@@ -191,8 +191,8 @@
     no.addEventListener("click", () => {
       document.body.innerHTML = `
         <div class="overlay black">
-          Meanie.<br><br>
-          Refresh the page and try again ☹️
+          Bitch.<br>
+          Go back and pick the right answer.
         </div>`;
     });
 
