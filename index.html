@@ -8,30 +8,62 @@
   <style>
     * {
       box-sizing: border-box;
-      touch-action: manipulation;
     }
 
     body {
       margin: 0;
       height: 100vh;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #ffe6ec;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    /* Falling hearts container */
+    .hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
       overflow: hidden;
+      z-index: 0;
+    }
+
+    .heart {
+      position: absolute;
+      top: -10%;
+      color: #ff5c8a;
+      opacity: 0.7;
+      animation-name: fall, sway;
+      animation-timing-function: linear, ease-in-out;
+      animation-iteration-count: infinite, infinite;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh);
+      }
+    }
+
+    @keyframes sway {
+      0% { margin-left: 0; }
+      50% { margin-left: 30px; }
+      100% { margin-left: 0; }
     }
 
     .card {
+      position: relative;
+      z-index: 1;
       background: white;
       padding: 2rem;
       border-radius: 1.25rem;
-      text-align: center;
+      text-align: centre;
       width: min(90vw, 360px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     }
 
-    .card h1 {
+    h1 {
       margin-bottom: 2rem;
       font-size: 1.6rem;
     }
@@ -50,24 +82,26 @@
       border: none;
       border-radius: 999px;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     #yes {
       background: #ff4d6d;
-      color: white;
-      transition: transform 0.5s ease;
+      colour: white;
       top: 0;
     }
 
     #no {
       background: #ccc;
-      color: #333;
+      colour: #333;
       top: 70px;
     }
   </style>
 </head>
 
 <body>
+  <div class="hearts"></div>
+
   <div class="card">
     <h1>Will you be my valentine?</h1>
     <div class="buttons">
@@ -79,39 +113,68 @@
   <script>
     const yesButton = document.getElementById("yes");
     const noButton = document.getElementById("no");
+    const heartsContainer = document.querySelector(".hearts");
 
-    // YES button: start growing after 5 seconds
+    /* ---------- YES button: grow slowly ---------- */
     let yesScale = 1;
-    setTimeout(() => {
+
+    function startYesGrowth() {
       setInterval(() => {
-        yesScale += 0.05;
+        yesScale += 0.03;
         yesButton.style.transform = `translateX(-50%) scale(${yesScale})`;
       }, 500);
-    }, 5000);
+    }
 
-    // NO button: start moving after 2 seconds
-    let velocity = 1;
+    /* ---------- NO button: slow wandering, gradual acceleration ---------- */
     let x = noButton.offsetLeft;
     let y = noButton.offsetTop;
+    let speed = 0.3;
 
+    function moveNo() {
+      x += (Math.random() - 0.5) * speed * 10;
+      y += (Math.random() - 0.5) * speed * 10;
+
+      const maxX = window.innerWidth - noButton.offsetWidth;
+      const maxY = window.innerHeight - noButton.offsetHeight;
+
+      x = Math.max(0, Math.min(maxX, x));
+      y = Math.max(0, Math.min(maxY, y));
+
+      noButton.style.left = x + "px";
+      noButton.style.top = y + "px";
+
+      speed += 0.002;
+      requestAnimationFrame(moveNo);
+    }
+
+    /* ---------- Falling hearts ---------- */
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.textContent = "♥";
+
+      const size = Math.random() * 20 + 10;
+      heart.style.fontSize = size + "px";
+      heart.style.left = Math.random() * 100 + "vw";
+
+      const fallDuration = Math.random() * 5 + 6;
+      const swayDuration = Math.random() * 2 + 3;
+
+      heart.style.animationDuration =
+        `${fallDuration}s, ${swayDuration}s`;
+
+      heartsContainer.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, fallDuration * 1000);
+    }
+
+    setInterval(createHeart, 400);
+
+    /* ---------- Start animations after 2 seconds ---------- */
     setTimeout(() => {
-      function moveNo() {
-        x += (Math.random() - 0.5) * velocity * 10;
-        y += (Math.random() - 0.5) * velocity * 10;
-
-        const maxX = window.innerWidth - noButton.offsetWidth;
-        const maxY = window.innerHeight - noButton.offsetHeight;
-
-        x = Math.max(0, Math.min(maxX, x));
-        y = Math.max(0, Math.min(maxY, y));
-
-        noButton.style.left = x + "px";
-        noButton.style.top = y + "px";
-
-        velocity += 0.01;
-        requestAnimationFrame(moveNo);
-      }
-
+      startYesGrowth();
       moveNo();
     }, 2000);
   </script>
