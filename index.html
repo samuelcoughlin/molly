@@ -129,29 +129,20 @@
       yes.style.transform = `translateX(-50%) scale(${yesScale})`;
     }, 500);
 
-    /* NO momentum + edge avoidance */
+    /* NO button physics */
     let x = no.offsetLeft;
     let y = no.offsetTop;
     let vx = 0;
     let vy = 0;
 
-    const acceleration = 0.1; // increased
-    let maxSpeed = 5;
-    const edgeBuffer = 20;
+    const acceleration = 0.06;
+    let maxSpeed = 4.5;
+    const bounceDamping = 0.85;
 
     function moveNo() {
-      // Random wandering force
+      // Random acceleration
       vx += (Math.random() - 0.5) * acceleration;
       vy += (Math.random() - 0.5) * acceleration;
-
-      const maxX = window.innerWidth - no.offsetWidth;
-      const maxY = window.innerHeight - no.offsetHeight;
-
-      // Edge steering
-      if (x < edgeBuffer) vx += 0.1;
-      if (x > maxX - edgeBuffer) vx -= 0.1;
-      if (y < edgeBuffer) vy += 0.1;
-      if (y > maxY - edgeBuffer) vy -= 0.1;
 
       // Clamp velocity
       vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
@@ -160,8 +151,19 @@
       x += vx;
       y += vy;
 
-      x = Math.max(0, Math.min(maxX, x));
-      y = Math.max(0, Math.min(maxY, y));
+      const maxX = window.innerWidth - no.offsetWidth;
+      const maxY = window.innerHeight - no.offsetHeight;
+
+      // HARD edge bounce (invert velocity)
+      if (x <= 0 || x >= maxX) {
+        vx = -vx * bounceDamping;
+        x = Math.max(0, Math.min(maxX, x));
+      }
+
+      if (y <= 0 || y >= maxY) {
+        vy = -vy * bounceDamping;
+        y = Math.max(0, Math.min(maxY, y));
+      }
 
       no.style.left = x + "px";
       no.style.top = y + "px";
@@ -186,12 +188,12 @@
 
     setInterval(() => dropEmoji("♥"), 400);
 
-    /* Clicks */
+    /* Click handlers */
     no.addEventListener("click", () => {
       document.body.innerHTML = `
         <div class="overlay black">
-          Bitch.<br>
-          Refresh the page and pick the right answer.
+          Meanie.<br><br>
+          Refresh the page and try again ☹️
         </div>`;
     });
 
@@ -202,7 +204,7 @@
         `
         <div class="overlay">
           <div class="card">
-            <h1>Yaaaaayyy!!!</h1>
+            <h1>Waaaowwww</h1>
           </div>
         </div>`
       );
