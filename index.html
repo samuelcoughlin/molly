@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Question</title>
+  <title>Valentine</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -21,7 +19,6 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    /* Background */
     .background {
       position: fixed;
       inset: 0;
@@ -37,17 +34,13 @@
       animation: fall linear infinite, sway ease-in-out infinite;
     }
 
-    @keyframes fall {
-      to { transform: translateY(110vh); }
-    }
-
+    @keyframes fall { to { transform: translateY(110vh); } }
     @keyframes sway {
       0% { margin-left: 0; }
       50% { margin-left: 40px; }
       100% { margin-left: 0; }
     }
 
-    /* Card */
     .card {
       position: relative;
       z-index: 1;
@@ -60,7 +53,7 @@
     }
 
     h1 {
-      margin-bottom: 3rem; /* more gap */
+      margin-bottom: 3rem;
       font-size: 1.5rem;
     }
 
@@ -78,7 +71,6 @@
       border: none;
       border-radius: 999px;
       cursor: pointer;
-      touch-action: manipulation;
     }
 
     #yes {
@@ -94,7 +86,6 @@
       color: black;
     }
 
-    /* Overlays */
     .overlay {
       position: fixed;
       inset: 0;
@@ -110,10 +101,6 @@
       text-align: center;
       padding: 2rem;
       font-size: 2rem;
-    }
-
-    .overlay .card {
-      width: min(85vw, 320px);
     }
   </style>
 </head>
@@ -137,36 +124,41 @@
 
     /* YES growth */
     let yesScale = 1;
-    function startYesGrowth() {
-      setInterval(() => {
-        yesScale += 0.03;
-        yes.style.transform = `translateX(-50%) scale(${yesScale})`;
-      }, 500);
-    }
+    setInterval(() => {
+      yesScale += 0.03;
+      yes.style.transform = `translateX(-50%) scale(${yesScale})`;
+    }, 500);
 
-    /* NO momentum movement */
+    /* NO momentum + edge avoidance */
     let x = no.offsetLeft;
     let y = no.offsetTop;
     let vx = 0;
     let vy = 0;
-    let acceleration = 0.06;
-    let maxSpeed = 4; // slightly faster
+
+    const acceleration = 0.06; // increased
+    let maxSpeed = 4.5;
+    const edgeBuffer = 80;
 
     function moveNo() {
+      // Random wandering force
       vx += (Math.random() - 0.5) * acceleration;
       vy += (Math.random() - 0.5) * acceleration;
 
+      const maxX = window.innerWidth - no.offsetWidth;
+      const maxY = window.innerHeight - no.offsetHeight;
+
+      // Edge steering
+      if (x < edgeBuffer) vx += 0.1;
+      if (x > maxX - edgeBuffer) vx -= 0.1;
+      if (y < edgeBuffer) vy += 0.1;
+      if (y > maxY - edgeBuffer) vy -= 0.1;
+
+      // Clamp velocity
       vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
       vy = Math.max(-maxSpeed, Math.min(maxSpeed, vy));
 
       x += vx;
       y += vy;
-
-      const maxX = window.innerWidth - no.offsetWidth;
-      const maxY = window.innerHeight - no.offsetHeight;
-
-      if (x <= 0 || x >= maxX) vx *= -0.9;
-      if (y <= 0 || y >= maxY) vy *= -0.9;
 
       x = Math.max(0, Math.min(maxX, x));
       y = Math.max(0, Math.min(maxY, y));
@@ -183,16 +175,13 @@
       const el = document.createElement("div");
       el.className = "falling";
       el.textContent = emoji;
-
       el.style.fontSize = Math.random() * 24 + 12 + "px";
       el.style.left = Math.random() * 100 + "vw";
-
-      const fall = Math.random() * 4 + 4;
-      const sway = Math.random() * 2 + 2;
-      el.style.animationDuration = `${fall}s, ${sway}s`;
+      el.style.animationDuration =
+        `${Math.random() * 4 + 4}s, ${Math.random() * 2 + 2}s`;
 
       bg.appendChild(el);
-      setTimeout(() => el.remove(), fall * 1000);
+      setTimeout(() => el.remove(), 8000);
     }
 
     setInterval(() => dropEmoji("♥"), 400);
@@ -201,8 +190,8 @@
     no.addEventListener("click", () => {
       document.body.innerHTML = `
         <div class="overlay black">
-          Meanie.<br><br>
-          Refresh the page and try again ☹️
+          Bitch.<br>
+          Refresh the page and pick the right answer.
         </div>`;
     });
 
@@ -213,24 +202,21 @@
         `
         <div class="overlay">
           <div class="card">
-            <h1>YAAAAYYYY!!!</h1>
+            <h1>Waaaowwww</h1>
           </div>
         </div>`
       );
 
-      const emojis = ["🎉","🎊","💖","💘","💝","💗","❤️","🥰","😍","💃","🕺","✨","🌈","💕"];
+      const emojis = ["🎉","🎊","💖","💘","💝","💗","❤️","🥰","😍","💃","🕺","✨","🌈","💕","💞"];
 
       setInterval(() => {
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 10; i++) {
           dropEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
         }
-      }, 100);
+      }, 90);
     });
 
-    setTimeout(() => {
-      startYesGrowth();
-      moveNo();
-    }, 2000);
+    setTimeout(moveNo, 2000);
   </script>
 </body>
 </html>
