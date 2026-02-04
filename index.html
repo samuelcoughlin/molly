@@ -140,34 +140,33 @@
     const bounceDamping = 0.85;
 
     function moveNo() {
-      // Random acceleration
+      // Apply small random acceleration
       vx += (Math.random() - 0.5) * acceleration;
       vy += (Math.random() - 0.5) * acceleration;
-
+    
       // Clamp velocity
       vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
       vy = Math.max(-maxSpeed, Math.min(maxSpeed, vy));
-
+    
+      // Update position
       x += vx;
       y += vy;
-
+    
+      // Get proper bounding box
       const maxX = window.innerWidth - no.offsetWidth;
       const maxY = window.innerHeight - no.offsetHeight;
-
-      // HARD edge bounce (invert velocity)
-      if (x <= 0 || x >= maxX) {
-        vx = -vx * bounceDamping;
-        x = Math.max(0, Math.min(maxX, x));
-      }
-
-      if (y <= 0 || y >= maxY) {
-        vy = -vy * bounceDamping;
-        y = Math.max(0, Math.min(maxY, y));
-      }
-
+    
+      // Bounce on edges
+      if (x <= 0) { x = 0; vx = -vx * bounceDamping; }
+      if (x >= maxX) { x = maxX; vx = -vx * bounceDamping; }
+    
+      if (y <= 0) { y = 0; vy = -vy * bounceDamping; }
+      if (y >= maxY) { y = maxY; vy = -vy * bounceDamping; }
+    
+      // Apply updated position
       no.style.left = x + "px";
       no.style.top = y + "px";
-
+    
       maxSpeed += 0.001;
       requestAnimationFrame(moveNo);
     }
